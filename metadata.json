@@ -1,0 +1,6 @@
+{
+  "name": "かがやきフェス スケジュール管理",
+  "description": "かがやきフェスの全ステージスケジュール確認、お気に入り登録、重複アラート機能付きのスケジュール管理アプリ。",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
