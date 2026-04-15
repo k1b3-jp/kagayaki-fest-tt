@@ -1,60 +1,51 @@
-name: Deploy Vite to GitHub Pages
+# 静的コンテンツを GitHub Pages にデプロイするためのシンプルなワークフロー
+name: Deploy static content to Pages
 
 on:
-  # mainブランチへのプッシュ時に実行
+  # 対象ブランチプッシュ時に実行されます
   push:
-    branches: ["main"]
-  # GitHub Actionsのタブから手動で実行できるようにする
+    branches: ['main']
+    
+  # Actions タブから手動でワークフローを実行できるようにします
   workflow_dispatch:
 
-# GitHub Pagesへのデプロイに必要な権限を設定
+# GITHUB_TOKEN のパーミッションを設定し、GitHub Pages へのデプロイを許可します
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# 複数デプロイが同時に走った場合、最新のものだけを有効にする
+# 1 つの同時デプロイメントを可能にする
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: true
 
 jobs:
-  # ビルドジョブ
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20 # お使いのNode.jsのバージョンに合わせて変更してください
-          cache: 'npm'     # yarnやpnpmを使用している場合は変更してください
-
-      - name: Install dependencies
-        run: npm ci        # yarnの場合は `yarn install --frozen-lockfile` など
-
-      - name: Build project
-        run: npm run build
-
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Viteのデフォルトの出力先ディレクトリ（dist）を指定
-          path: './dist'
-
-  # デプロイジョブ
+  # デプロイするだけなので、単一のデプロイジョブ
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # dist フォルダーのアップロード
+          path: './dist'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
